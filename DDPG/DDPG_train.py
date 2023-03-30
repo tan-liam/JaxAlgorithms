@@ -42,22 +42,18 @@ class DDPG:
             next_states,
             predicted_actions,
         )
-        Q_state_next, Q_loss = update_Q_step(self.Q_state, states, actions, target)
-        Q_target_next = soft_update_params(Q_state_next, self.Q_target_state, self.tau)
-        policy_state_next, policy_loss = train_policy_step(
-            self.policy_state, Q_state_next, states
+        self.Q_state, Q_loss = update_Q_step(self.Q_state, states, actions, target)
+        self.Q_target_state = soft_update_params(
+            self.Q_state, self.Q_target_state, self.tau
         )
-        policy_target_next = soft_update_params(
-            policy_state_next, self.policy_target, self.tau
+        self.policy_state, policy_loss = train_policy_step(
+            self.policy_state, self.Q_state, states
         )
-        networks = {
-            "Q_state": Q_state_next,
-            "Q_target": Q_target_next,
-            "policy_state": policy_state_next,
-            "policy_target": policy_target_next,
-        }
+        self.policy_target_state = soft_update_params(
+            self.policy_state, self.policy_target_state, self.tau
+        )
         losses = {"Q_loss": Q_loss, "policy_loss": policy_loss}
-        return networks, losses
+        return losses
 
     @partial(jax.jit, static_argnums=(0,))
     def forward_policy(self, states):
