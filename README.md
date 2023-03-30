@@ -2,4 +2,4 @@
 
 My own practice for learning RL
 
-I've implemented the DDPG updates so far.
+Classes for DDPG and TD3 have been implemented. All you need to pass in is the trainstates and some hyperparameters.
